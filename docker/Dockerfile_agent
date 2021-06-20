@@ -14,9 +14,7 @@ RUN chmod -R 0775 /opt/appd
 #######################################################
 
 RUN chmod +x /startup.sh
-
 RUN chmod +w /etc/resolv.conf
-
 
 ADD java-services.jar java-services.jar
 
