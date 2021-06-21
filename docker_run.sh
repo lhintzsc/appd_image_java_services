@@ -22,12 +22,25 @@ JAVA_OPTS="$JAVA_OPTS -Dappdynamics.agent.tierName=java-service"
 JAVA_OPTS="$JAVA_OPTS -Dappdynamics.agent.nodeName=java-service"
 JAVA_OPTS="$JAVA_OPTS -Dappdynamics.agent.uniqueHostId=myLaptop"
 
-echo $JAVA_OPTS
+#
+# Optional: configure network vizibility
+#
+
+#JAVA_OPTS="$JAVA_OPTS -Dappdynamics.netviz.host=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')"
+#JAVA_OPTS="$JAVA_OPTS -Dappdynamics.netviz.port=3892"
+
+export APPDYNAMICS_NETVIZ_AGENT_HOST=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
+export APPDYNAMICS_NETVIZ_AGENT_PORT=3892
 
 #
 # Start Java program in container using custom JVM parameter
 #
 
+echo $JAVA_OPTS
+
 docker run \
-	--env JAVA_OPTS="$JAVA_OPTS"\
-	java-services-agent:latest &
+  --env JAVA_OPTS="$JAVA_OPTS" \
+  --env APPDYNAMICS_NETVIZ_AGENT_HOST="$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')" \
+  --env APPDYNAMICS_NETVIZ_AGENT_PORT="3892" \
+  --publish 8080:8080 \
+  java-services-agent:latest &
